@@ -128,8 +128,11 @@ def FEM_theta(N, M, theta):
 
 
 #### error analysis ####
-#the code runs significantly longer. I haven't stoped the time but 10-15 minutes. For the M=4**l case the error is O(n) for theta=0.5. For theta=0.3 it doesn't converge (as always and with similar arguments). For theta=1 the error still falls linearly.
-#For M=2**l, theta =0.5 the error falls quadratically. For theta=1 linearly. For theta=0.3 it doesm't converge.
+
+#for m=2**l theta=0.5 gets o(h**2 + k**2) but theta=1 is linear o(h**2+k)
+#for m=4**l both theta=0.5 and theta=1 are linear since h**2/k is constant and o(h**2) dominates
+#theta=0.3 is unstable in both setups because it fails stability for theta < 0.5
+#this shows crank-nicolson needs balanced discretization for second order accuracy
 #I saved the theta=0.5, M=4**l version as a png and attatched it to the solution.
 
 nb_samples = 5
