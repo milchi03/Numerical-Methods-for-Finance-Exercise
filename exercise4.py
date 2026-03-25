@@ -128,16 +128,27 @@ def FEM_theta(N, M, theta):
 
 
 #### error analysis ####
+#c
+#for theta=.3: Error unbounded, not convergent.
+#Using Slide 5 and 6 of slide deck 3 k:= sup(km) <= C*h_min^2/(1-2theta). This is clearly not satisfied bc C*h/(1-2*0.3) -> 0 for h->0.
 
-#for m=2**l theta=0.5 gets o(h**2 + k**2) but theta=1 is linear o(h**2+k)
-#for m=4**l both theta=0.5 and theta=1 are linear since h**2/k is constant and o(h**2) dominates
-#theta=0.3 is unstable in both setups because it fails stability for theta < 0.5
-#this shows crank-nicolson needs balanced discretization for second order accuracy
-#I saved the theta=0.5, M=4**l version as a png and attatched it to the solution.
+#for theta=.5: Error converges, error is linear.
+#using slide 6, this is expected. Quadratic convergence is similar to what we sad in FDM. We haven't covered this yet in the lecture though.
+
+#for theta=1 is converges with the same argument. Linearly this time, similar to FDM.
+
+#d
+#for theta=.3: Error unbounded, not convergent.
+#analogus to c.
+
+#for theta=.5: Error converges, error is linear.
+#using slide 6, this is expected. O(h^2+k^2)=O(k+k^2)=O(k) (for error convergence) so we converge linearly in k.
+
+#for theta=1 is converges with the same argument. Linearly this time, similar to FDM.
 
 nb_samples = 5
-N = np.array([2**l-1 for l in range(2,nb_samples+2)])
-M = np.array([4**l for l in range(2,nb_samples+2)]) # M = np.array([2**l for l in range(6,nb_samples+1)])
+N = np.array([2**l-1 for l in range(6,nb_samples+1)])
+M = np.array([4**l for l in range(6,nb_samples+1)]) # M = np.array([2**l for l in range(6,nb_samples+1)])
 theta = 0.3
 
 #### Do not change any code below! ####
