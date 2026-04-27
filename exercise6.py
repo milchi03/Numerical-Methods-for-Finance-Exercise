@@ -91,6 +91,7 @@ print(
     f"FEM with theta={theta}, beta={beta}: Convergence rate in discrete l^2 norm with respect to time step $k$: {conv_rate}"
 )
 
+#test
 #For beta=17, we get roughly p=2, for beta=1 we get roughly p=0.5.
 #This comes from the discountinuity of the option price as t->T (or tau-> 0) violating the assumption of continuity of the solution.
 #With beta increasing, we put x**beta more points to the closer maturing areas in the grid, refining the grid
