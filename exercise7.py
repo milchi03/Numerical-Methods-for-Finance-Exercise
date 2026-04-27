@@ -71,9 +71,16 @@ M = np.power(2, np.arange(4, 4 + nb_samples))
 
 
 #### Report
-#for theta=.5 convergence is O(k^2). This is expected because the payoff function is in H_0^1(G) so our theory predicts it should convergere like that for this theta.
+#c
+# for theta=.5 convergence is O(k^2). This is expected because the payoff function is in H_0^1(G) so our theory predicts it should convergere like that for this theta.
 #We can observe as close to R, the boundary condition pulls down our internal option price estimate towards 0. This makes sense as we imposed this condition on the PDE.
 #This is why we choose R far away from what we believe to be a reasonable price range as within our estimate is great!
+
+#d
+#The third plot generated gives insight into how the error in the interior behaves based on our choice of R. In particular it is quite insightful because of the shape.
+#We can see that for increasing R the approximation becomes significantly better (exponentially better even) up to a certain point at R=2.5.
+#After R=2.5 the error stays almost constant. This is expected due to illconditioning in the numerical problem acting as a lower bound on the error obtained.
+
 
 #### Do not change any code below! ####
 error = np.zeros(nb_samples) 
