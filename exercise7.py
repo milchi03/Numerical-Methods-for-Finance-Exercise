@@ -89,7 +89,7 @@ k =  T / M
 grid = np.linspace(-R,R,N[nb_samples-1]+2)
 grid = grid[1:-1].reshape(N[nb_samples-1],1)
 plt.plot( grid
-        , FEM_theta(N[nb_samples-1],M[nb_samples-1],theta,R,sigma,K,r,T)
+        , FEM_theta(N[nb_samples-1],M[nb_samples-1],theta,R,sigma,K,r,T) # type: ignore
         , 'r-', label='FEM solution'  # plot with the color red, as line
         )
 plt.plot( grid
@@ -114,7 +114,7 @@ try:
        raise Exception("Error unbounded. Plots not shown.")
    print("FEM method with theta="+str(theta)+" converges: Convergence rate in discrete $L^inf$ norm with respect to time step $k$: " + str(
         conv_rate[0]))
-   plt.figure(figsize=[10, 6])
+   plt.figure(figsize=[10, 6]) # type: ignore
    plt.loglog(k, error, '-x', label='error')
    plt.loglog(k, k, '--', label='$O(k)$')
    plt.loglog(k, k**2, '--', label='$O(k^2)$')
@@ -125,7 +125,7 @@ try:
    plt.plot()
    plt.show()
    
-   plt.figure(figsize=[10, 6])
+   plt.figure(figsize=[10, 6]) # type: ignore
    RR = np.arange(1.25, 4.25, 0.25)
    NN = 2**7 * RR ** 1-1
    MM = 2**7 * RR ** 0

@@ -171,7 +171,7 @@ try:
     print(
         f"FEM with theta={theta} converges: Convergence rate in discrete $L^2$ norm with respect to time step $k$: {conv_rate[0]}"
     )
-    plt.figure(figsize=[10, 6])
+    plt.figure(figsize=[10, 6]) # type: ignore
     plt.loglog(k, l2error, "-x", label="error")
     plt.loglog(k, k, "--", label="$O(k)$")
     plt.loglog(k, k**2, "--", label="$O(k^2)$")

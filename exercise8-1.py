@@ -61,7 +61,7 @@ def FEM_theta(N, M, R, B, r, sigma, K, T, theta):
         u_new = spsolve(Bmat, Cmat@u_old)
         u_old = u_new
     
-    u_sol = u_new
+    u_sol = u_new # type: ignore
     return u_sol
 
 if __name__ == '__main__':
