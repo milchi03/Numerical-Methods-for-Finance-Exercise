@@ -50,7 +50,6 @@ def eulerexplicit(N, M):
     x = np.linspace(0, 1, N+1)[1:]
 
     u = initial_value(x)
-    print(u)
 
     for m in range(0,M):
         u = C_mat @ u # N = 4 => 4x4 @ 4
@@ -58,17 +57,34 @@ def eulerexplicit(N, M):
 
 
 def eulerimplicit(N, M):
-    # todo 3 b)
-    return
+    G_mat = np.diag([-2]*N) + np.diag([1]*(N-1), k=1) + np.diag([1]*(N-1), k=-1)
+    G_mat[N-1, N-2] = 2
+    
+    k = 1/M
+    h = 1/N # N = 4 => h = 0.25
+    nu = k/(h**2)
+
+    C_mat = np.diag([1]*N) - nu*G_mat
+
+    # N = 4 => x = [0, 0.25, 0.5, 0.75, 1] gives N = 4 intervalls
+    x = np.linspace(0, 1, N+1)[1:]
+
+    u = initial_value(x)
+
+    for m in range(0,M):
+        u = lin.solve(C_mat, u) # N = 4 => 4x4 @ 4
+    return u
 
 
 #### error analysis ####
 nb_samples = 5
-N = # todo for 3 c)
-M = # todo  for 3 c) and 3 d)
+N = [2**l for l in range(2,2+nb_samples)]
+M = [4**l for l in range(2,2+nb_samples)]
 l2errorexplicit = np.zeros(nb_samples)  # error vector for explicit method
 l2errorimplicit = np.zeros(nb_samples)  # error vector for implicit method
-h2k = 1 / (N ** 2) + 1 / M
+h2k = [1 / (N[i] ** 2) + 1 / M[i] for i in range(0, nb_samples)]
+
+# comments: "overflow encountered in matmul" => approximation error unbounded. N = 4, M = 16 => h = 1/4, k = 1/16 => nu = k/h**2 = 1 but nu < 1/2 required for stability.
 
 
 #### Do not change any code below! ####
