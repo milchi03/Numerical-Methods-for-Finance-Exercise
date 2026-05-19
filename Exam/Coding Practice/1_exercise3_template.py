@@ -97,7 +97,7 @@ try:
         raise Exception("Error unbounded for explicit method. Plots not shown.")
     print("Explicit method converges: Convergence rate in discrete $L^2$ norm with respect to $h^2+k$: " + str(
         conv_rate[0]))
-    plt.figure(figsize=[10, 6])
+    plt.figure(figsize=[10, 6]) #type: ignore
     plt.loglog(h2k, l2errorexplicit, '-x', label='error')
     plt.loglog(h2k, h2k, '--', label='$O(h^2+k)$')
     plt.title('$L^2$ convergence rate for explicit method', fontsize=13)
@@ -117,7 +117,7 @@ try:
         raise Exception("Error unbounded for implicit method. Plots not shown.")
     print("Implicit method converges: Convergence rate in discrete $L^2$ norm with respect to $h^2+k$: " + str(
         conv_rate[0]))
-    plt.figure(figsize=[10, 6])
+    plt.figure(figsize=[10, 6]) #type: ignore
     plt.loglog(h2k, l2errorimplicit, '-x', label='error')
     plt.loglog(h2k, h2k, '--', label='$O(h^2+k)$')
     plt.title('$L^2$ convergence rate for implicit method', fontsize=13)
