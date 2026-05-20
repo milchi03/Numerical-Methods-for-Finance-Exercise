@@ -6,22 +6,60 @@ import numpy.linalg as lin
 from scipy.stats import norm
 
 def build_massMatrix(N,R):
+    h = 2*R/(N+1)
+    
+    s1 = np.diag([4]*N)
+    s2 = np.diag([1]*(N-1), k=-1)
+    s3 = np.diag([1]*(N-1), k=1)
+    
+    M_mat = h/6 * (s1 + s2 + s3)
 
-
+    M_mat = sp.csr_matrix(M_mat)
+    return M_mat
 
 
 def build_BSMatrix(N,sigma,r,R):
+    h = 2*R/(N+1)
 
+    fact1 = sigma**2/2
+    fact2 = (sigma**2/2 -r)
+    fact3 = r
 
+    s11 = np.diag([2]*N)
+    s12 = np.diag([-1]*(N-1), k=1)
+    s13 = np.diag([-1]*(N-1), k=-1)
+
+    s1 = 1/h * (s11 + s12 + s13)
+    s1 = sp.csr_matrix(s1)
+    
+
+    s21 = np.diag([0]*N)
+    s22 = np.diag([1/2]*N, k=1)
+    s23 = np.diag([1/2]*N, k=-1)
+
+    s2 = s21 + s22 + s23
+    s2 = sp.csr_matrix(s2)
+
+    s3 = build_massMatrix(N, R)
+
+    A_mat = fact1*s1 + fact2*s2 + fact3*s3
+    return A_mat
 
 
 def bs_formula_C(s,t,sigma,K,r):
+    d1_upper = np.log(s/K) + (r + sigma**2/2)*t
+    d1_lower = sigma * np.sqrt(t)
 
+    d1 = d1_upper/d1_lower
+
+    d2 = d1 - sigma * np.sqrt(t)
+
+    c = norm.cdf(d1)*s - norm.cdf(d2)*K*np.exp(-r*t)
+    return c
 
 
 def u0(x,K):
-
-
+    max(0, np.exp(x) - K)
 
 
 def exactu(t,x,sigma,K,r):
