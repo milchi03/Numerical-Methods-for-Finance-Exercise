@@ -34,8 +34,8 @@ def build_BSMatrix(N,sigma,r,R):
     
 
     s21 = np.diag([0]*N)
-    s22 = np.diag([1/2]*N, k=1)
-    s23 = np.diag([1/2]*N, k=-1)
+    s22 = np.diag([1/2]*(N-1), k=1)
+    s23 = np.diag([-1/2]*(N-1), k=-1)
 
     s2 = s21 + s22 + s23
     s2 = sp.csr_matrix(s2)
@@ -59,7 +59,8 @@ def bs_formula_C(s,t,sigma,K,r):
 
 
 def u0(x,K):
-    max(0, np.exp(x) - K)
+    g = [max(0, np.exp(xi) - K) for xi in x]
+    return np.array(g)
 
 
 def exactu(t,x,sigma,K,r):
@@ -71,7 +72,7 @@ def FEM_theta(N,M,theta,R,sigma,K,r,T):
     k = T/M
     grid = np.linspace(-R,R,N+2)
     grid = grid[1:-1]
-    u_sol = u0(grid,K).reshape(N,1)
+    u_sol = u0(grid,K).reshape(N,1) #type: ignore
     MatrixM = build_massMatrix(N,R)
     MatrixA = build_BSMatrix(N,sigma,r,R)
     B_theta = MatrixM + k*theta*MatrixA
@@ -93,10 +94,17 @@ r = 0.05
 R = 4
 K = 1
 G = R/2 
-theta= 0.5
+theta = 0.5
 nb_samples = 5
 N = np.power(2, np.arange(4, 4 + nb_samples))-1
 M = np.power(2, np.arange(4, 4 + nb_samples))
+
+# comments: For x -> R the error explodes as the function approaches 0 while the call option obviously keeps increasing for increasing prices.
+# the error is as theory suggests O(k**2 + h**2) = O(k**2) (as we set N=M). This is because the call option is a continuous function on the interior of the grid and 
+# in H1 on the boundary t=0 as it is continuous but has a kink (weak differential is (in log-space) the step function 0 before K and 1 afterwards)
+# so for theta=0.5 we have unconditional convergence for a H1 function.
+# The error falls initially exponentially fast as theory suggests: for g polynomial order (true for max(0,exp(x)-K) for all (t,x) in [0,T]xR: |u(t,x) - u_R(t,x)| <= C * exp(-gamma1 * R + gamma2 * |x|).
+# for R > 2.5 the discretization error (baked into the constant) dominates putting a floor to the error.
 
 
 #### Do not change any code below! ####
@@ -106,7 +114,7 @@ k =  T / M
 grid = np.linspace(-R,R,N[nb_samples-1]+2)
 grid = grid[1:-1].reshape(N[nb_samples-1],1)
 plt.plot( grid
-        , FEM_theta(N[nb_samples-1],M[nb_samples-1],theta,R,sigma,K,r,T)
+        , FEM_theta(N[nb_samples-1],M[nb_samples-1],theta,R,sigma,K,r,T) #type: ignore
         , 'r-', label='FEM solution'  # plot with the color red, as line
         )
 plt.plot( grid
@@ -131,7 +139,7 @@ try:
        raise Exception("Error unbounded. Plots not shown.")
    print("FEM method with theta="+str(theta)+" converges: Convergence rate in discrete $L^inf$ norm with respect to time step $k$: " + str(
         conv_rate[0]))
-   plt.figure(figsize=[10, 6])
+   plt.figure(figsize=[10, 6]) #type: ignore
    plt.loglog(k, error, '-x', label='error')
    plt.loglog(k, k, '--', label='$O(k)$')
    plt.loglog(k, k**2, '--', label='$O(k^2)$')
@@ -142,7 +150,7 @@ try:
    plt.plot()
    plt.show()
    
-   plt.figure(figsize=[10, 6])
+   plt.figure(figsize=[10, 6]) #type: ignore
    RR = np.arange(1.25, 4.25, 0.25)
    NN = 2**7 * RR ** 1-1
    MM = 2**7 * RR ** 0
