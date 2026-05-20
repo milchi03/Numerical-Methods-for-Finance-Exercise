@@ -49,19 +49,51 @@ def build_F(t, N):
     return a * (h[:-1] + h[1:]) / 6 + ab2 * h[:-1] / 3 + b * h[1:] / 3
 
 
-def FEM_theta(N, M, theta, beta):
-    # implement the theta scheme for time step t_j = (j/M)^beta
+def FEM_theta(N, M, theta, beta=1):
+    h = 1/(N+1)
+    # k = 1/M
 
+    x = np.array([h*i for i in range(1, N+1)][0:N+1])
+    #print(f'x = {x}, should have lengh ={N}')
 
-#### error analysis ####
+    M_mat = build_massMatrix(N)
+    A_mat = build_rigidityMatrix(N)
+    
+    u_est = initial_value(x)
+
+    for j in range(M):
+        t_beta = (j/M)**beta
+        t1_beta = ((j+1)/M)**beta
+
+        k = t1_beta - t_beta
+
+        B = M_mat + k*theta*A_mat
+        C = M_mat - k*(1-theta)*A_mat
+
+        F_m = build_F(t_beta, N)
+        F_m1 = build_F(t1_beta, N)
+        F_vec = k*theta*F_m1 + k*(1-theta)*F_m
+
+        RHS = C @ u_est + F_vec
+
+        u_est = spsolve(B, RHS)
+    return u_est
+
+print(FEM_theta(9,9, 0.5, 17))
+
+# #### error analysis ####
 nb_samples = 3
 N = np.power(2, np.arange(9, 9 + nb_samples)) - 1
 M = np.power(2, np.arange(9, 9 + nb_samples))
 theta = 0.5
-beta = # set beta according to b) and d)
+beta = 1 # set beta according to b) and d)
 
-conv_rate = # Estimate the convergence rate
+# d)
+# We cannot expect O(h**2 + k**2) convergence because we have a step function. 
+# True step functions are not in H2 because to be in H2 one needs to be continuous (result from exercise).
 
-print(
-    f"FEM with theta={theta}, beta={beta}: Convergence rate in discrete l^2 norm with respect to time step $k$: {conv_rate}"
-)
+# conv_rate = # Estimate the convergence rate
+
+# print(
+#     f"FEM with theta={theta}, beta={beta}: Convergence rate in discrete l^2 norm with respect to time step $k$: {conv_rate}"
+# )
