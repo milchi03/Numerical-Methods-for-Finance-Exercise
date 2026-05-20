@@ -4,33 +4,48 @@ from scipy.sparse.linalg import spsolve
 import matplotlib.pyplot as plt
 import numpy.linalg as lin
 
+def simpson_rule(f, a, b):
+    fact = (b-a)/6
+    left = f(a)
+    mid = 4*f((a+b)/2)
+    right = f(b)
 
+    return fact * (left + mid + right)
 
 def alpha(x):
-    # Todo : Implement the function alpha
-    return
+    return 1+x**2
 
 
 def beta(x):
-    # Todo : Implement the function beta
-    return
+    return 2*x
 
 
 def gamma(x):
-    # Todo : Implement the function gamma
-    return
-
+    return np.pi**2*x**2
 
 
 def build_massMatrix(N):
-    # Todo : Implement the function build_massMatrix
-    return
+    h = 1/(N+1)
+
+    M_mat = h/6 * (np.diag([4]*N) + np.diag([1]*(N-1), k=-1) + np.diag([1]*(N-1), k=-1))
+    M_mat = sp.csc_matrix(M_mat)
+    return M_mat
 
 
+def build_rigidityMatrix(N, alpha, beta, gamma):    
+    h = 1/(N+1)
 
-def build_rigidityMatrix(N, alpha, beta, gamma):
-    # Todo : Implement the function build_rigidityMatrix
-    return
+    def f1(x):
+        if x<=0 or x>=h:
+            return 0
+        return alpha(x)*(x/h)**2
+
+    A_mat = np.zeros(N,N)
+    for i in range(N):
+        A_mat[i,i] = simpson_rule()
+
+    A_mat = sp.csc_matrix(A_mat)
+    return A_mat
 
 
 def f(t, x):
