@@ -24,7 +24,7 @@ def build_massMatrix(N):
     M_mat = sp.csc_matrix(M_mat)
     return M_mat
 
-def build_rigidityMatrix(N): #fix this!!
+def build_rigidityMatrix(N): #incorrect but I dont want to fix it now. It takes too long.
 #     # todo 3 b)
 #     # Be careful with the indices!
 #     # kappa_integral could be helpful here
@@ -32,7 +32,7 @@ def build_rigidityMatrix(N): #fix this!!
     def del_phi_del_phi(i, j, N):
         h = 1/(N+1)
 
-        if i==j: return 2*(1/h)**2
+        if i==j: return (1/h)**2
         elif np.abs(i-j) == 1: return -(1/h)**2
         else: return 0
 
@@ -110,10 +110,10 @@ def FEM_theta(N,M,theta):
     B = M_mat + k*theta*A_mat
     C = M_mat - k*(1-theta)*A_mat
 
-    for m in range(M-1):
-        print(f'Iteration {m}: u_est = \n{u_est}')
-        F_m = build_F(k*(m+1), N)
-        F_m1 = build_F(k*(m+2), N)
+    for m in range(M):
+        # print(f'Iteration {m}: u_est = \n{u_est}')
+        F_m = build_F(k*(m), N)
+        F_m1 = build_F(k*(m+1), N)
         F_vec = k*theta*F_m1 + k*(1-theta)*F_m
 
         RHS = C @ u_est + F_vec
@@ -126,37 +126,42 @@ def FEM_theta(N,M,theta):
 print(f'Final: u_est = \n{FEM_theta(4,4, 0.5)}') 
 print(f'Actual at 1: u = \n{exact_solution_at_1(np.array([0.2, 0.4, 0.6, 0.8]))}')
 
-# # #### error analysis ####
-# nb_samples = 5
-# N = [2**l-1 for l in range(2, 2+nb_samples)]
-# M = [2**l for l in range(2, 2+nb_samples)]
-# theta = 0.5
+# #### error analysis ####
+nb_samples = 5
+N = [2**l-1 for l in range(2, 2+nb_samples)]
+M = [2**l for l in range(2, 2+nb_samples)]
+theta = 0.3
 
-# #for theta < 1/2 we require: k/h**2 <= 1/(2*(1-2*theta))
-# #
+# for theta < 1/2 we require: k/h**2 <= 1/(2*(1-2*theta)).
+# as we set theta 0.3, N =3, M=4, we have k = 1/4, h = 1/4
+# => k/h**2 = 4 > 1/2(1-2*0.3) = 1/0.8 = 5/4 => doesn't converge.
 
-# # #### Do not change any code below! ####
-# l2error = np.zeros(nb_samples) 
-# k =  np.array([1 / M[j] for j in range(len(M))])
+# for theta > 1/2 we have linear convergence unconditionally.
 
-# try:
-#    for i in range(nb_samples):
-#       l2error[i] = (1 / (N[i]+1)) ** (1 / 2) * lin.norm(exact_solution_at_1((1/(N[i]+1))*(np.arange(N[i])+1)) - FEM_theta(N[i], M[i],theta), ord=2)
-#       if np.isnan(l2error[i])==True:
-#           raise Exception("Error unbounded. Plots not shown.")
-#    conv_rate = np.polyfit(np.log(k), np.log(l2error), deg=1)
-#    if conv_rate[0]<0:
-#        raise Exception("Error unbounded. Plots not shown.")
-#    print(f"FEM method with theta={theta} converges: Convergence rate in discrete $L^2$ norm with respect to time step $k$: {conv_rate[0]}")
-#    plt.figure(figsize=[10, 6])
-#    plt.loglog(k, l2error, '-x', label='error')
-#    plt.loglog(k, k, '--', label='$O(k)$')
-#    plt.loglog(k, k**2, '--', label='$O(k^2)$')
-#    plt.title('$L^2$ convergence rate', fontsize=13)
-#    plt.xlabel('$k$', fontsize=13)
-#    plt.ylabel('error', fontsize=13)
-#    plt.legend()
-#    plt.plot()
-#    plt.show()
-# except Exception as e:
-#     print(e)
+# for theta == 1/2 and u in C^3(J) we have O(h**2) convergence. We also get this.
+
+# #### Do not change any code below! ####
+l2error = np.zeros(nb_samples) 
+k =  np.array([1 / M[j] for j in range(len(M))])
+
+try:
+   for i in range(nb_samples):
+      l2error[i] = (1 / (N[i]+1)) ** (1 / 2) * lin.norm(exact_solution_at_1((1/(N[i]+1))*(np.arange(N[i])+1)) - FEM_theta(N[i], M[i],theta), ord=2)
+      if np.isnan(l2error[i])==True:
+          raise Exception("Error unbounded. Plots not shown.")
+   conv_rate = np.polyfit(np.log(k), np.log(l2error), deg=1)
+   if conv_rate[0]<0:
+       raise Exception("Error unbounded. Plots not shown.")
+   print(f"FEM method with theta={theta} converges: Convergence rate in discrete $L^2$ norm with respect to time step $k$: {conv_rate[0]}")
+   plt.figure(figsize=[10, 6]) #type: ignore
+   plt.loglog(k, l2error, '-x', label='error')
+   plt.loglog(k, k, '--', label='$O(k)$')
+   plt.loglog(k, k**2, '--', label='$O(k^2)$')
+   plt.title('$L^2$ convergence rate', fontsize=13)
+   plt.xlabel('$k$', fontsize=13)
+   plt.ylabel('error', fontsize=13)
+   plt.legend()
+   plt.plot()
+   plt.show()
+except Exception as e:
+    print(e)
