@@ -2,16 +2,37 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.sparse.linalg import spsolve
+import scipy.sparse as sp
 
 from assembleMatrix import assembleMatrix
 
 
 def buildMassCIR(N, R, mu):
-    return
+
+    def a(r):
+        return np.zeros_like(r)
+    
+    def b(r):
+        return np.zeros_like(r)
+    
+    def c(r):
+        return r**(2*mu)
+
+    return assembleMatrix(N, R, a, b, c)
 
 
 def buildACIR(N, R, alpha, beta, sigma, mu):
-    return
+
+    def a(r):
+        return 1/2 * sigma**2 * r**(2*mu+1)
+    
+    def b(r):
+        return (sigma**2*mu + 1/2*sigma**2 - alpha + beta * r) * r**(2*mu)
+    
+    def c(r):
+        return r**(2*mu+1)
+    
+    return assembleMatrix(N, R, a, b, c)
 
 
 def g(s, T, T1, K):
@@ -19,7 +40,29 @@ def g(s, T, T1, K):
 
 
 def FEM_theta(N, k, R, t, alpha, beta, sigma, mu, u_init, theta):
-    return
+    
+    M = int(np.floor(t/k))
+
+    # h = R / (N+1) #not used in this set up.
+    k = k # k = 1/M instead?
+
+    # r = np.array([i*h for i in range(1,N+1)]) #not used in this set up.
+
+    M_mat = buildMassCIR(N, R, mu)
+    A_mat = buildACIR(N, R, alpha, beta, sigma, mu)
+
+    B_mat = M_mat + k*theta*A_mat
+    B_mat = sp.csr_matrix(B_mat)
+    C_mat = M_mat - k*(1-theta)*A_mat
+    C_mat = sp.csr_matrix(C_mat)
+
+    u_sol = u_init 
+    
+    for _ in range(M):
+        RHS = C_mat @ u_sol
+        u_sol = spsolve(B_mat, RHS)
+    
+    return u_sol
 
 
 def plot_FEM(fig, ax, rightlim, u_sol, N, R, label, markersize=2):
@@ -45,12 +88,15 @@ if __name__ == "__main__":
 
     # Compute zero coupon bond price
     # Initial condition
-    u_init = 
+    h = R / (N+1)
+    r = np.array([i*h for i in range(N+1)])
+    u_init = np.array([1 for _ in range(N+1)])
     # zero coupon bond price at time T
-    u_0 = 
+    u_0 = FEM_theta(N, k, R, T, alpha, beta, sigma, mu, u_init, theta)
 
-    # Compute floorlet price
-    u_1 = 
+    # # Compute floorlet price
+    u_init = u_0 * (T1-T) * np.maximum (K - (1-u_0)/((T1-T)*u_0), 0)
+    u_1 = FEM_theta(N, k, R, T, alpha, beta, sigma, mu, u_init, theta)
 
     ##################### You do not need to modify any code below this line #####################
 
@@ -61,7 +107,7 @@ if __name__ == "__main__":
     ax_1.set_xlabel(r"$r$")
     ax_1.set_ylabel("Price")
     ax_1.legend()
-    plt.savefig(Path.home() / "questions" / "Problem3" / "plot_bond.pdf", format="pdf")
+    # plt.savefig(Path.home() / "questions" / "Problem3" / "plot_bond.pdf", format="pdf")
     plt.show(block=False)
 
     from exact import circpl_CIR
@@ -80,5 +126,5 @@ if __name__ == "__main__":
     ax_2.set_xlabel(r"$r$")
     ax_2.set_ylabel("Price")
     ax_2.legend()
-    plt.savefig(Path.home() / "questions" / "Problem3" / "plot_floorlet.pdf", format="pdf")
+    # plt.savefig(Path.home() / "questions" / "Problem3" / "plot_floorlet.pdf", format="pdf")
     plt.show()

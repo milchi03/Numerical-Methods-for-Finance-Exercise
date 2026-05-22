@@ -27,7 +27,7 @@ def assembleMatrixAs(N, R, func):
     diag[1:] += 1 / (2 * h) * (func(dof[1:] + p1) + func(dof[1:] + p2))
     lodiag = -1 / (2 * h) * (func(dof[:-1] + p1) + func(dof[:-1] + p2))
     updiag = lodiag
-    As= sp.diags([lodiag, diag, updiag], [-1, 0, 1])
+    As= sp.diags([lodiag, diag, updiag], [-1, 0, 1]) #type: ignore
     return As
 
 
@@ -58,7 +58,7 @@ def assembleMatrixAb(N, R, func):
     diag[1:] += -1 / 2 * (func(dof[1:] + p1) * w2 + func(dof[1:] + p2) * w1)
     lodiag = -1 / 2 * (func(dof[:-1] + p1) * w1 + func(dof[:-1] + p2) * w2)
     updiag = 1 / 2 * (func(dof[:-1] + p1) * w2 + func(dof[:-1] + p2) * w1)
-    Ab = sp.diags([lodiag, diag, updiag], [-1, 0, 1])
+    Ab = sp.diags([lodiag, diag, updiag], [-1, 0, 1]) #type: ignore
     return Ab
 
 
@@ -89,7 +89,7 @@ def assembleMatrixAm(N, R, func):
     diag[1:] += h / 2 * (func(dof[1:] + p1) * w2**2 + func(dof[1:] + p2) * w1**2)
     updiag = h / 2 * w1 * w2 * (func(dof[:-1] + p1) + func(dof[:-1] + p2))
     lodiag = updiag
-    Am = sp.diags([lodiag, diag, updiag], [-1, 0, 1])
+    Am = sp.diags([lodiag, diag, updiag], [-1, 0, 1]) #type: ignore
     return Am
 
 
